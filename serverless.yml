@@ -1,0 +1,42 @@
+service:
+  name: udacity-capstone
+
+plugins:
+  - serverless-webpack
+  - serverless-iam-roles-per-function
+  - serverless-aws-documentation
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-2'}
+  environment:
+    SIGNED_URL_EXPIRATION: 300
+    BREW_RECIPES_TABLE: BrewRecipes-${self:provider.stage}
+
+custom:
+  webpack:
+    webpackConfig: 'webpack.config.js'
+    includeModules: true
+    packager: 'npm'
+
+functions:
+
+  Auth:
+    handler: src/lambda/auth/handler.handler
+
+resources:
+  Resources:
+    
+    BrewRecipesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.BREW_RECIPES_TABLE}
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        BillingMode: PAY_PER_REQUEST
