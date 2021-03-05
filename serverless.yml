@@ -20,6 +20,12 @@ custom:
     webpackConfig: 'webpack.config.js'
     includeModules: true
     packager: 'npm'
+  documentation:
+    api:
+      info:
+        version: v1.0.0
+        title: Coffee Brewing Recipes for the Hario V60
+        description: Search, create and share user-made recipes for brewing pour-over coffee with the Hario V60
 
 functions:
 
