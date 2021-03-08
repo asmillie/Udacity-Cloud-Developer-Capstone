@@ -14,6 +14,9 @@ provider:
   environment:
     SIGNED_URL_EXPIRATION: 300
     BREW_RECIPES_TABLE: BrewRecipes-${self:provider.stage}
+    RECIPE_STEPS_TABLE: RecipeSteps-${self:provider.stage}
+    RECIPE_STEP_THUMBNAILS_BUCKET: RecipeStepThumbnails-${self:provider.stage}
+    RECIPE_STEP_RAW_IMAGES_BUCKET: RecipeStepRawImage-${self:provider.stage}
 
 custom:
   webpack:
@@ -26,6 +29,7 @@ custom:
         version: v1.0.0
         title: Coffee Brewing Recipes for the Hario V60
         description: Search, create and share user-made recipes for brewing pour-over coffee with the Hario V60
+  recipeStepImageUploadTopic: RecipeStepImageUploadTopic-${self:provider.stage}
 
 functions:
 
@@ -42,7 +46,92 @@ resources:
         KeySchema:
           - AttributeName: userId
             KeyType: HASH
+          - AttributeName: title
+            KeyType: RANGE
         AttributeDefinitions:
           - AttributeName: userId
             AttributeType: S
+          - AttributeName: title
+            AttributeType: S
         BillingMode: PAY_PER_REQUEST
+    
+    RecipeStepsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.RECIPE_STEPS_TABLE}
+        KeySchema:
+          - AttributeName: recipeId
+            KeyType: HASH
+          - AttributeName: position
+            KeyType: RANGE
+        AttributeDefinitions:
+          - AttributeName: recipeId
+            AttributeType: S
+          - AttributeName: position
+            AttributeType: S
+        BillingMode: PAY_PER_REQUEST
+
+    RecipeStepThumbnailsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.RECIPE_STEP_THUMBNAILS_BUCKET}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              MaxAge: 3000
+
+    RecipeStepRawImagesBucket:
+      Type: AWS::S3::Bucket
+      DependsOn: RecipeStepImageUploadTopicPolicy
+      Properties:
+        BucketName: ${self:provider.environment.RECIPE_STEP_RAW_IMAGES_BUCKET}
+        NotificationConfiguration:
+          TopicConfigurations:
+          - Event: s3:ObjectCreated:Put
+            Topic: !Ref RecipeStepImageUploadTopic
+        CorsConfiguration:
+          CorsRules:
+            - AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              MaxAge: 3000
+
+    RecipeStepImageUploadTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        DisplayName: Recipe Step Image Upload Event
+        TopicName: ${self:custom.recipeStepImageUploadTopic}
+
+    RecipeStepImageUploadTopicPolicy:
+      Type: AWS::SNS::TopicPolicy
+      Properties:
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                AWS: '*'
+              Action: sns:Publish
+              Resource: !Ref RecipeStepImageUploadTopic
+              Condition:
+                ArnLike:
+                  AWS:SourceArn: arn:aws:s3:::${self:provider.environment.RECIPE_STEP_RAW_IMAGES_BUCKET}
+        Topics:
+          - !Ref RecipeStepImageUploadTopic
+
