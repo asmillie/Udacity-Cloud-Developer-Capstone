@@ -30,6 +30,7 @@ custom:
         title: Coffee Brewing Recipes for the Hario V60
         description: Search, create and share user-made recipes for brewing pour-over coffee with the Hario V60
   recipeStepImageUploadTopic: RecipeStepImageUploadTopic-${self:provider.stage}
+  imageResizedTopic: ImageResizedTopic-${self:provider.stage}
 
 functions:
 
@@ -73,8 +74,13 @@ resources:
 
     RecipeStepThumbnailsBucket:
       Type: AWS::S3::Bucket
+      DependsOn: ImageResizedTopicPolicy
       Properties:
         BucketName: ${self:provider.environment.RECIPE_STEP_THUMBNAILS_BUCKET}
+        NotificationConfiguration:
+          TopicConfigurations:
+            - Event: s3:ObjectCreated:Put
+              Topic: !Ref ImageResizedTopic
         CorsConfiguration:
           CorsRules:
             - AllowedMethods:
@@ -134,4 +140,27 @@ resources:
                   AWS:SourceArn: arn:aws:s3:::${self:provider.environment.RECIPE_STEP_RAW_IMAGES_BUCKET}
         Topics:
           - !Ref RecipeStepImageUploadTopic
+
+    ImageResizedTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        DisplayName: Recipe Step Image Resized Event
+        TopicName: ${self:custom.imageResizedTopic}
+
+    ImageResizedTopicPolicy:
+      Type: AWS::SNS::TopicPolicy
+      Properties:
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                AWS: '*'
+              Action: sns:Publish
+              Resource: !Ref ImageResizedTopic
+              Condition:
+                ArnLike:
+                  AWS:SourceArn: arn:aws:s3:::${self:provider.environment.RECIPE_STEP_THUMBNAILS_BUCKET}
+        Topics:
+          - !Ref ImageResizedTopic
 
