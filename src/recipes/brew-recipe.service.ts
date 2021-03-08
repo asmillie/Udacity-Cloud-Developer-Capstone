@@ -127,7 +127,7 @@ export class BrewRecipeService {
      * @returns Brew recipe that was deleted
      */
     async deleteBrewRecipeById(userId: string, recipeId: string): Promise<BrewRecipeItem> {
-        this.logger.info(`Deleting brew recipe id ${recipeId}`);
+        this.logger.info(`Deleting brew recipe for recipe id ${recipeId}`);
 
         const params: DeleteItemInput = {
             TableName: this.brewRecipeTbl,
