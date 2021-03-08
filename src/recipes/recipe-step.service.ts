@@ -151,6 +151,12 @@ export class RecipeStepService {
             });
     }
 
+    /**
+     * Delete a single recipe step
+     * @param recipeId Id of recipe the step belongs to
+     * @param stepId Id of recipe step to delete
+     * @returns Recipe Step that was deleted
+     */
     async deleteRecipeStepById(recipeId: string, stepId: string): Promise<RecipeStepItem> {
         this.logger.info(`Delete recipe step for id ${stepId}`);
 
