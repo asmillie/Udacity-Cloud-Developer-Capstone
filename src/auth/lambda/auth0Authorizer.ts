@@ -8,7 +8,7 @@ import { Jwt } from '../../auth/Jwt'
 import { JwtPayload } from '../../auth/JwtPayload'
 
 const logger = createLogger('auth')
-const jwksUri = 'https://dev-x4xgby3m.us.auth0.com/.well-known/jwks.json'; // TODO: Replace with Udacity Capstone Auth0 App
+const jwksUri = 'https://dev-x4xgby3m.us.auth0.com/.well-known/jwks.json';
 
 export const handler = async (
   event: APIGatewayTokenAuthorizerEvent
