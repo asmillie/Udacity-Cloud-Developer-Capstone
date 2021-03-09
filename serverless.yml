@@ -277,6 +277,33 @@ functions:
                   summary: Delete a Recipe Step
                   description: Delete a Step for a V60 Brew Recipe
 
+        GenerateUploadUrl:
+          handler: src/brew-recipes/lambda/http/generateUploadUrl.handler
+          iamRoleStatements:
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+                - s3:PutObject
+              Resource: arn:aws:s3:::${self:provider.environment.RECIPE_STEP_RAW_IMAGES_BUCKET}/*
+            - Effect: Allow
+              Action:
+                - xray:PutTraceSegments
+                - xray:PutTelemetryRecords
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - cloudwatch:PutMetricData
+              Resource: '*'
+          events:
+            - http:
+                method: post
+                path: brewRecipes/{recipeId}/steps/${stepId}/image
+                cors: true
+                authorizer: Auth
+                documentation:
+                  summary: Get a Signed Url to Upload an Image
+                  description: Returns a signed Url that allows an image of the Recipe Step to be uploaded
+
 resources:
   Resources:
     
