@@ -178,4 +178,46 @@ export class RecipeStepService {
                 throw new Error('Error occurred during delete operation');
             });
     }
+
+    /**
+     * Updates a recipe step with a Url to a thumbnail image
+     * @param recipeId Id of recipe the step belongs to
+     * @param stepId Id of step being updated
+     */
+    async saveThumbnailUrl(recipeId: string, stepId: string): Promise<void> {
+        const thumbnailUrl = `http://${this.thumbnailsBucketName}.s3.amazonaws.com/${stepId}`;
+
+        const params: UpdateItemInput = {
+            TableName: this.recipeStepTbl,
+            Key: {
+                'recipeId': { S: recipeId },
+                'stepId': { S: stepId }
+            },
+            UpdateExpression: 'set thumbnailUrl = :thumbnailUrl',
+            ExpressionAttributeValues: {
+                ':thumbnailUrl': { S: thumbnailUrl }
+            }
+        };
+
+        await this.docClient.update(params)
+            .promise()
+            .catch(err => {
+                this.logger.error(`Error updating recipe step id ${stepId} with thumbnail Url: ${err}`);
+                throw new Error(`Error updating recipe step with thumbnail Url`);
+            });
+    }
+
+    /**
+     * Get a signed url to upload a file to an AWS S3 bucket
+     * @param stepId Id of recipe step the image is connected to
+     * @returns Url as a string
+     */
+    getUploadUrl(stepId: string): string {
+        this.logger.info(`Getting Signed Upload Url for step Id ${stepId}`);
+        return this.s3Client.getSignedUrl('putObject', {
+            Bucket: this.rawImagesBucketName,
+            Key: stepId,
+            Expires: parseInt(this.urlExpiration, 10)
+        });
+    }
 }
