@@ -11,12 +11,16 @@ provider:
   runtime: nodejs12.x
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-2'}
+  tracing:
+    apiGateway: true
+    lambda: true
   environment:
     SIGNED_URL_EXPIRATION: 300
     BREW_RECIPES_TABLE: BrewRecipes-${self:provider.stage}
     RECIPE_STEPS_TABLE: RecipeSteps-${self:provider.stage}
     RECIPE_STEP_THUMBNAILS_BUCKET: RecipeStepThumbnails-${self:provider.stage}
     RECIPE_STEP_RAW_IMAGES_BUCKET: RecipeStepRawImage-${self:provider.stage}
+    METRIC_NAMESPACE: ${self:service.name}-${self:provider.stage}
 
 custom:
   webpack:
@@ -29,6 +33,13 @@ custom:
         version: v1.0.0
         title: Coffee Brewing Recipes for the Hario V60
         description: Search, create and share user-made recipes for brewing pour-over coffee with the Hario V60
+    models:
+      - name: CreateBrewRecipeRequest
+        contentType: application/json
+        schema: ${file(models/create-brew-recipe-request.json)}
+      - name: UpdateBrewRecipeRequest
+        contentType: application/json
+        schema: ${file(models/update-brew-recipe-request.json)}
   recipeStepImageUploadTopic: RecipeStepImageUploadTopic-${self:provider.stage}
   imageResizedTopic: ImageResizedTopic-${self:provider.stage}
 
@@ -36,6 +47,118 @@ functions:
 
   Auth:
     handler: src/lambda/auth/handler.handler
+    iamRoleStatements: []
+
+  GetBrewRecipes:
+    handler: src/brew-recipes/lambda/http/getBrewRecipes.handler
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.BREW_RECIPES_TABLE}
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource: '*'
+      - Effect: Allow
+        Action:
+          - cloudwatch:PutMetricData
+        Resource: '*'
+    events:
+      - http:
+          method: get
+          path: brewRecipes
+          cors: true
+          authorizer: Auth
+          documentation:
+            summary: Get all Brew Recipes
+            description: Get all V60 Brew Recipes for the current logged-in User
+
+    CreateBrewRecipe:
+      handler: src/brew-recipes/lambda/http/createBrewRecipe.handler
+      iamRoleStatements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+          Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.BREW_RECIPES_TABLE}
+        - Effect: Allow
+          Action:
+            - xray:PutTraceSegments
+            - xray:PutTelemetryRecords
+          Resource: '*'
+        - Effect: Allow
+          Action:
+            - cloudwatch:PutMetricData
+          Resource: '*'
+      events:
+        - http:
+            method: post
+            path: brewRecipes
+            cors: true
+            authorizer: Auth
+            reqValidatorName: RequestBodyValidator
+            documentation:
+              summary: Create a new V60 Brew Recipe
+              description: Create a new Hario V60 Brew Recipes for the current logged-in User
+              requestModels:
+                'application/json': CreateBrewRecipeRequest
+
+      UpdateBrewRecipe:
+        handler: src/brew-recipes/lambda/http/updateBrewRecipe.handler
+        iamRoleStatements:
+          - Effect: Allow
+            Action:
+              - dynamodb:UpdateItem
+            Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.BREW_RECIPES_TABLE}
+          - Effect: Allow
+            Action:
+              - xray:PutTraceSegments
+              - xray:PutTelemetryRecords
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - cloudwatch:PutMetricData
+            Resource: '*'
+        events:
+          - http:
+              method: patch
+              path: brewRecipes/{recipeId}
+              cors: true
+              authorizer: Auth
+              reqValidatorName: RequestBodyValidator
+              documentation:
+                summary: Update a V60 Brew Recipe
+                description: Update a Hario V60 Brew Recipe belonging to the current logged-in User
+                requestModels:
+                  'application/json': UpdateBrewRecipeRequest
+
+      DeleteBrewRecipe:
+        handler: src/brew-recipes/lambda/http/deleteBrewRecipe.handler
+        iamRoleStatements:
+          - Effect: Allow
+            Action:
+              - dynamodb:DeleteItem
+            Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.BREW_RECIPES_TABLE}
+          - Effect: Allow
+            Action:
+              - xray:PutTraceSegments
+              - xray:PutTelemetryRecords
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - cloudwatch:PutMetricData
+            Resource: '*'
+        events:
+          - http:
+              method: delete
+              path: brewRecipes/{recipeId}
+              cors: true
+              authorizer: Auth
+              documentation:
+                summary: Delete a V60 Brew Recipe
+                description: Delete a Hario V60 Brew Recipe belonging to the current logged-in User
 
 resources:
   Resources:
@@ -163,4 +286,13 @@ resources:
                   AWS:SourceArn: arn:aws:s3:::${self:provider.environment.RECIPE_STEP_THUMBNAILS_BUCKET}
         Topics:
           - !Ref ImageResizedTopic
+
+    RequestBodyValidator:
+      Type: AWS::ApiGateway::RequestValidator
+      Properties:
+        RestApiId: 
+          Ref: ApiGatewayRestApi
+        Name: 'request-body-validator'
+        ValidateRequestBody: true
+        ValidateRequestParameters: false
 

@@ -32,4 +32,4 @@ export async function saveExecutionTimeMetric(serviceName: string, startTimeMS: 
     await cw.putMetricData(params).promise().catch(err => {
         logger.error(`Error logging execution time metric: ${err}`);        
     });
-  }
+}

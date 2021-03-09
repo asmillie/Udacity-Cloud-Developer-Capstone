@@ -93,12 +93,13 @@ export class BrewRecipeService {
      * @param updateBrewRecipeRequest Attributes to be updated
      * @returns Updated Brew Recipe Item
      */
-    async updateBrewRecipe(userId: string, updateBrewRecipeRequest: UpdateBrewRecipeRequest): Promise<BrewRecipeItem> {
-        const { recipeId, title } = updateBrewRecipeRequest;
-        this.logger.info(`Updating brew recipe for recipe id ${recipeId}`);
+    async updateBrewRecipe(userId: string, recipeId: string, updateBrewRecipeRequest: UpdateBrewRecipeRequest): Promise<BrewRecipeItem> {
         if (!recipeId) {
             throw new Error('Cannot update brew recipe, missing recipe Id');
         }
+        
+        const { title } = updateBrewRecipeRequest;
+        this.logger.info(`Updating brew recipe for recipe id ${recipeId}`);        
 
         const params: UpdateItemInput = {
             TableName: this.brewRecipeTbl,

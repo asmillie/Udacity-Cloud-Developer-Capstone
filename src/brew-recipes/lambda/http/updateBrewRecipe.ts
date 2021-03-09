@@ -2,17 +2,18 @@ import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } f
 import { getUserId, prepareApiResponse } from "../../../utils/api";
 import { saveExecutionTimeMetric } from "../../../utils/metrics";
 import { BrewRecipeRepository } from "../../brew-recipe.repository";
-import { CreateBrewRecipeRequest } from "../../requests/CreateBrewRecipeRequest";
+import { UpdateBrewRecipeRequest } from "../../requests/UpdateBrewRecipeRequest";
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const startTimeMS = new Date().getTime();
     const userId = getUserId(event);
-    const createBrewRecipeReq: CreateBrewRecipeRequest = JSON.parse(event.body);
+    const recipeId = event.pathParameters.recipeId;
+    const updateBrewRecipeReq: UpdateBrewRecipeRequest = JSON.parse(event.body);
 
     const brewRecipeRepository = new BrewRecipeRepository();
-    const recipe = await brewRecipeRepository.createBrewRecipe(userId, createBrewRecipeReq);
+    const recipe = await brewRecipeRepository.updateBrewRecipe(userId, recipeId, updateBrewRecipeReq);
 
-    await saveExecutionTimeMetric('CreateBrewRecipe', startTimeMS);
+    await saveExecutionTimeMetric('UpdateBrewRecipe', startTimeMS);
 
-    return prepareApiResponse(201, { recipe });
+    return prepareApiResponse(200, { recipe });
 }
