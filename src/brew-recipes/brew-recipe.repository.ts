@@ -18,8 +18,8 @@ export class BrewRecipeRepository {
         return await this.createBrewRecipe(userId, createBrewRecipeRequest);
     }
 
-    async updateBrewRecipe(userId: string, recipeId: string, updateBrewRecipeRequest: UpdateBrewRecipeRequest): Promise<BrewRecipeItem> {
-        return await this.updateBrewRecipe(userId, recipeId, updateBrewRecipeRequest);
+    async updateBrewRecipe(userId: string, updateBrewRecipeRequest: UpdateBrewRecipeRequest): Promise<BrewRecipeItem> {
+        return await this.updateBrewRecipe(userId, updateBrewRecipeRequest);
     }
 
     async deleteBrewRecipeById(userId: string, recipeId: string): Promise<BrewRecipeItem> {

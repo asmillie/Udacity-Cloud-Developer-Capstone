@@ -93,8 +93,12 @@ export class BrewRecipeService {
      * @param updateBrewRecipeRequest Attributes to be updated
      * @returns Updated Brew Recipe Item
      */
-    async updateBrewRecipe(userId: string, recipeId: string, updateBrewRecipeRequest: UpdateBrewRecipeRequest): Promise<BrewRecipeItem> {
+    async updateBrewRecipe(userId: string, updateBrewRecipeRequest: UpdateBrewRecipeRequest): Promise<BrewRecipeItem> {
+        const { recipeId, title } = updateBrewRecipeRequest;
         this.logger.info(`Updating brew recipe for recipe id ${recipeId}`);
+        if (!recipeId) {
+            throw new Error('Cannot update brew recipe, missing recipe Id');
+        }
 
         const params: UpdateItemInput = {
             TableName: this.brewRecipeTbl,
@@ -104,7 +108,7 @@ export class BrewRecipeService {
             },
             UpdateExpression: 'set title = :title, updatedAt = :updatedAt',
             ExpressionAttributeValues: {
-                ':title': { S: updateBrewRecipeRequest.title },
+                ':title': { S: title },
                 ':updatedAt': { S: new Date().toISOString() }
             },
             ReturnValues: 'ALL_NEW'
