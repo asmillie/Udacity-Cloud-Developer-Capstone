@@ -40,6 +40,12 @@ custom:
       - name: UpdateBrewRecipeRequest
         contentType: application/json
         schema: ${file(models/update-brew-recipe-request.json)}
+      - name: CreateRecipeStepRequest
+        contentType: application/json
+        schema: ${file(models/create-recipe-step-request.json)}
+      - name: UpdateRecipeStepRequest
+        contentType: application/json
+        schema: ${file(models/update-recipe-step-request.json)}
   recipeStepImageUploadTopic: RecipeStepImageUploadTopic-${self:provider.stage}
   imageResizedTopic: ImageResizedTopic-${self:provider.stage}
 
@@ -159,6 +165,117 @@ functions:
               documentation:
                 summary: Delete a V60 Brew Recipe
                 description: Delete a Hario V60 Brew Recipe belonging to the current logged-in User
+
+        GetRecipeSteps:
+          handler: src/brew-recipes/lambda/http/getRecipeSteps.handler
+          iamRoleStatements:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+                - dynamodb:Query
+              Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.RECIPE_STEPS_TABLE}
+            - Effect: Allow
+              Action:
+                - xray:PutTraceSegments
+                - xray:PutTelemetryRecords
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - cloudwatch:PutMetricData
+              Resource: '*'
+          events:
+            - http:
+                method: get
+                path: brewRecipes/{recipeId}/steps
+                cors: true
+                authorizer: Auth
+                documentation:
+                  summary: Get all Recipe Steps by Recipe Id
+                  description: Get all Recipe Steps for a V60 Brew Recipe
+
+        CreateRecipeStep:
+          handler: src/brew-recipes/lambda/http/createRecipeStep.handler
+          iamRoleStatements:
+            - Effect: Allow
+              Action:
+                - dynamodb:PutItem
+              Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.RECIPE_STEPS_TABLE}
+            - Effect: Allow
+              Action:
+                - xray:PutTraceSegments
+                - xray:PutTelemetryRecords
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - cloudwatch:PutMetricData
+              Resource: '*'
+          events:
+            - http:
+              method: post
+              path: brewRecipes/{recipeId}/steps
+              cors: true
+              authorizer: Auth
+              reqValidatorName: RequestBodyValidator
+              documentation:
+                summary: Create a Recipe Step
+                description: Create a recipe step for a V60 Brew Recipe
+                requestModels:
+                  'application/json': CreateRecipeStepRequest
+
+        UpdateRecipeStep:
+          handler: src/brew-recipes/lambda/http/updateRecipeStep.handler
+          iamRoleStatements:
+            - Effect: Allow
+              Action:
+                - dynamodb:UpdateItem
+              Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.RECIPE_STEPS_TABLE}
+            - Effect: Allow
+              Action:
+                - xray:PutTraceSegments
+                - xray:PutTelemetryRecords
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - cloudwatch:PutMetricData
+              Resource: '*'
+          events:
+            - http:
+                method: patch
+                path: brewRecipes/{recipeId}/steps/{stepId}
+                cors: true
+                authorizer: Auth
+                reqValidatorName: RequestBodyValidator
+                documentation:
+                  summary: Update a Recipe Step
+                  description: Update a recipe step for a V60 Brew Recipe
+                  requestModels:
+                    'application/json': UpdateRecipeStepRequest
+
+        DeleteRecipeStep:
+          handler: src/brew-recipes/lambda/http/deleteRecipeStep.handler
+          iamRoleStatements:
+            - Effect: Allow
+              Action:
+                - dynamodb:DeleteItem
+              Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.RECIPE_STEPS_TABLE}
+            - Effect: Allow
+              Action:
+                - xray:PutTraceSegments
+                - xray:PutTelemetryRecords
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - cloudwatch:PutMetricData
+              Resource: '*'
+          events:
+            - http:
+                method: delete
+                path: brewRecipes/{recipeId}/steps/{stepId}
+                cors: true
+                authorizer: Auth
+                documentation:
+                  summary: Delete a Recipe Step
+                  description: Delete a Step for a V60 Brew Recipe
 
 resources:
   Resources:

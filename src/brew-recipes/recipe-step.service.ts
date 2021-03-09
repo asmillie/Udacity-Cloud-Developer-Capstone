@@ -62,10 +62,11 @@ export class RecipeStepService {
      * @param createRecipeStepRequest Recipe Step Attributes
      * @returns Promise containing created recipe step
      */
-    async createRecipeStep(createRecipeStepRequest: CreateRecipeStepRequest): Promise<RecipeStepItem> {
-        this.logger.info(`Creating new recipe step for recipe id ${createRecipeStepRequest.recipeId}`);
+    async createRecipeStep(recipeId: string, createRecipeStepRequest: CreateRecipeStepRequest): Promise<RecipeStepItem> {
+        this.logger.info(`Creating new recipe step for recipe id ${recipeId}`);
 
         const newRecipeStepItem: RecipeStepItem = {
+            recipeId,
             stepId: uuid(),
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
@@ -75,7 +76,7 @@ export class RecipeStepService {
         const params: PutItemInput = {
             TableName: this.recipeStepTbl,
             Item: {
-                recipeId: { S: newRecipeStepItem.recipeId },
+                recipeId: { S: recipeId },
                 position: { N: newRecipeStepItem.position.toString() },
                 stepId: { S: newRecipeStepItem.stepId },
                 createdAt: { S: newRecipeStepItem.createdAt },

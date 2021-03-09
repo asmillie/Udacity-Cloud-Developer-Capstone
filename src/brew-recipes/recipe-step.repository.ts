@@ -14,8 +14,8 @@ export class RecipeStepRepository {
         return await this.recipeStepService.getAllRecipeStepsByRecipeId(recipeId);
     }
 
-    async createRecipeStep(createRecipeStepRequest: CreateRecipeStepRequest): Promise<RecipeStepItem> {
-        return await this.createRecipeStep(createRecipeStepRequest);
+    async createRecipeStep(recipeId: string, createRecipeStepRequest: CreateRecipeStepRequest): Promise<RecipeStepItem> {
+        return await this.createRecipeStep(recipeId, createRecipeStepRequest);
     }
 
     async updateRecipeStep(recipeId: string, stepId: string, updateRecipeStepRequest: UpdateRecipeStepRequest): Promise<RecipeStepItem> {

@@ -1,0 +1,17 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "todo",
+    "type": "object",
+    "properties": {
+        "instructions": {
+            "type": "string"
+        },
+        "durationInMS": {
+            "type": "integer"
+        },
+        "position": {
+            "type": "integer"
+        }
+    },
+    "required": ["instructions","durationInMS","position"]
+}
