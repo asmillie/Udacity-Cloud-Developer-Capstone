@@ -89,7 +89,7 @@ export class RecipeStepService {
         return await this.docClient.put(params)
             .promise()
             .then(() => newRecipeStepItem, err => {
-                this.logger.error(`Error creating new recipe step for recipe id ${createRecipeStepRequest.recipeId}: ${err}`);
+                this.logger.error(`Error creating new recipe step for recipe id ${recipeId}: ${err}`);
                 throw new Error(`Error creating new recipe step`);
             });
 
