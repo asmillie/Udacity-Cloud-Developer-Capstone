@@ -255,7 +255,7 @@ functions:
     events:
       - http:
           method: post
-          path: brewRecipes/{recipeId}/steps/${stepId}/image
+          path: brewRecipes/{recipeId}/steps/{stepId}/image
           cors: true
           authorizer: Auth
 
