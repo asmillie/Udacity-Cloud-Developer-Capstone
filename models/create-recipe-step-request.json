@@ -3,6 +3,9 @@
     "title": "todo",
     "type": "object",
     "properties": {
+        "recipeId": {
+            "type": "string"
+        },
         "instructions": {
             "type": "string"
         },
@@ -13,5 +16,5 @@
             "type": "integer"
         }
     },
-    "required": ["instructions","durationInMS","position"]
+    "required": ["recipeId","instructions","durationInMS","position"]
 }

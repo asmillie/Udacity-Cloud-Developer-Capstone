@@ -5,7 +5,7 @@ import { RecipeStepRepository } from "../../recipe-step.repository";
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const startTimeMS = new Date().getTime();
-    const recipeId = event.pathParameters.recipeId;
+    const recipeId = event.queryStringParameters.recipeId;
     const recipeStepRepository = new RecipeStepRepository();
 
     const steps = await recipeStepRepository.getAllRecipeStepsByRecipeId(recipeId);
