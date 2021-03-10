@@ -1,16 +1,19 @@
-service:
-  name: udacity-capstone
+service: udacity-capstone
 
 plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
   - serverless-aws-documentation
+  - serverless-reqvalidator-plugin
 
 provider:
   name: aws
   runtime: nodejs12.x
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-2'}
+  lambdaHashingVersion: '20201221'
+  apiGateway:
+    shouldStartNameWithService: true
   tracing:
     apiGateway: true
     lambda: true
@@ -82,280 +85,280 @@ functions:
             summary: Get all Brew Recipes
             description: Get all V60 Brew Recipes for the current logged-in User
 
-    CreateBrewRecipe:
-      handler: src/brew-recipes/lambda/http/createBrewRecipe.handler
-      iamRoleStatements:
-        - Effect: Allow
-          Action:
-            - dynamodb:PutItem
-          Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.BREW_RECIPES_TABLE}
-        - Effect: Allow
-          Action:
-            - xray:PutTraceSegments
-            - xray:PutTelemetryRecords
-          Resource: '*'
-        - Effect: Allow
-          Action:
-            - cloudwatch:PutMetricData
-          Resource: '*'
-      events:
-        - http:
-            method: post
-            path: brewRecipes
-            cors: true
-            authorizer: Auth
-            reqValidatorName: RequestBodyValidator
-            documentation:
-              summary: Create a new V60 Brew Recipe
-              description: Create a new Hario V60 Brew Recipes for the current logged-in User
-              requestModels:
-                'application/json': CreateBrewRecipeRequest
+  CreateBrewRecipe:
+    handler: src/brew-recipes/lambda/http/createBrewRecipe.handler
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.BREW_RECIPES_TABLE}
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource: '*'
+      - Effect: Allow
+        Action:
+          - cloudwatch:PutMetricData
+        Resource: '*'
+    events:
+      - http:
+          method: post
+          path: brewRecipes
+          cors: true
+          authorizer: Auth
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Create a new V60 Brew Recipe
+            description: Create a new Hario V60 Brew Recipes for the current logged-in User
+            requestModels:
+              'application/json': CreateBrewRecipeRequest
 
-      UpdateBrewRecipe:
-        handler: src/brew-recipes/lambda/http/updateBrewRecipe.handler
-        iamRoleStatements:
-          - Effect: Allow
-            Action:
-              - dynamodb:UpdateItem
-            Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.BREW_RECIPES_TABLE}
-          - Effect: Allow
-            Action:
-              - xray:PutTraceSegments
-              - xray:PutTelemetryRecords
-            Resource: '*'
-          - Effect: Allow
-            Action:
-              - cloudwatch:PutMetricData
-            Resource: '*'
-        events:
-          - http:
-              method: patch
-              path: brewRecipes/{recipeId}
-              cors: true
-              authorizer: Auth
-              reqValidatorName: RequestBodyValidator
-              documentation:
-                summary: Update a V60 Brew Recipe
-                description: Update a Hario V60 Brew Recipe belonging to the current logged-in User
-                requestModels:
-                  'application/json': UpdateBrewRecipeRequest
+  UpdateBrewRecipe:
+    handler: src/brew-recipes/lambda/http/updateBrewRecipe.handler
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.BREW_RECIPES_TABLE}
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource: '*'
+      - Effect: Allow
+        Action:
+          - cloudwatch:PutMetricData
+        Resource: '*'
+    events:
+      - http:
+          method: patch
+          path: brewRecipes/{recipeId}
+          cors: true
+          authorizer: Auth
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Update a V60 Brew Recipe
+            description: Update a Hario V60 Brew Recipe belonging to the current logged-in User
+            requestModels:
+              'application/json': UpdateBrewRecipeRequest
 
-      DeleteBrewRecipe:
-        handler: src/brew-recipes/lambda/http/deleteBrewRecipe.handler
-        iamRoleStatements:
-          - Effect: Allow
-            Action:
-              - dynamodb:DeleteItem
-            Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.BREW_RECIPES_TABLE}
-          - Effect: Allow
-            Action:
-              - xray:PutTraceSegments
-              - xray:PutTelemetryRecords
-            Resource: '*'
-          - Effect: Allow
-            Action:
-              - cloudwatch:PutMetricData
-            Resource: '*'
-        events:
-          - http:
-              method: delete
-              path: brewRecipes/{recipeId}
-              cors: true
-              authorizer: Auth
-              documentation:
-                summary: Delete a V60 Brew Recipe
-                description: Delete a Hario V60 Brew Recipe belonging to the current logged-in User
+  DeleteBrewRecipe:
+    handler: src/brew-recipes/lambda/http/deleteBrewRecipe.handler
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:DeleteItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.BREW_RECIPES_TABLE}
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource: '*'
+      - Effect: Allow
+        Action:
+          - cloudwatch:PutMetricData
+        Resource: '*'
+    events:
+      - http:
+          method: delete
+          path: brewRecipes/{recipeId}
+          cors: true
+          authorizer: Auth
+          documentation:
+            summary: Delete a V60 Brew Recipe
+            description: Delete a Hario V60 Brew Recipe belonging to the current logged-in User
 
-        GetRecipeSteps:
-          handler: src/brew-recipes/lambda/http/getRecipeSteps.handler
-          iamRoleStatements:
-            - Effect: Allow
-              Action:
-                - dynamodb:GetItem
-                - dynamodb:Query
-              Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.RECIPE_STEPS_TABLE}
-            - Effect: Allow
-              Action:
-                - xray:PutTraceSegments
-                - xray:PutTelemetryRecords
-              Resource: '*'
-            - Effect: Allow
-              Action:
-                - cloudwatch:PutMetricData
-              Resource: '*'
-          events:
-            - http:
-                method: get
-                path: brewRecipes/{recipeId}/steps
-                cors: true
-                authorizer: Auth
-                documentation:
-                  summary: Get all Recipe Steps by Recipe Id
-                  description: Get all Recipe Steps for a V60 Brew Recipe
+  GetRecipeSteps:
+    handler: src/brew-recipes/lambda/http/getRecipeSteps.handler
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.RECIPE_STEPS_TABLE}
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource: '*'
+      - Effect: Allow
+        Action:
+          - cloudwatch:PutMetricData
+        Resource: '*'
+    events:
+      - http:
+          method: get
+          path: brewRecipes/{recipeId}/steps
+          cors: true
+          authorizer: Auth
+          documentation:
+            summary: Get all Recipe Steps by Recipe Id
+            description: Get all Recipe Steps for a V60 Brew Recipe
 
-        CreateRecipeStep:
-          handler: src/brew-recipes/lambda/http/createRecipeStep.handler
-          iamRoleStatements:
-            - Effect: Allow
-              Action:
-                - dynamodb:PutItem
-              Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.RECIPE_STEPS_TABLE}
-            - Effect: Allow
-              Action:
-                - xray:PutTraceSegments
-                - xray:PutTelemetryRecords
-              Resource: '*'
-            - Effect: Allow
-              Action:
-                - cloudwatch:PutMetricData
-              Resource: '*'
-          events:
-            - http:
-              method: post
-              path: brewRecipes/{recipeId}/steps
-              cors: true
-              authorizer: Auth
-              reqValidatorName: RequestBodyValidator
-              documentation:
-                summary: Create a Recipe Step
-                description: Create a recipe step for a V60 Brew Recipe
-                requestModels:
-                  'application/json': CreateRecipeStepRequest
+  CreateRecipeStep:
+    handler: src/brew-recipes/lambda/http/createRecipeStep.handler
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.RECIPE_STEPS_TABLE}
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource: '*'
+      - Effect: Allow
+        Action:
+          - cloudwatch:PutMetricData
+        Resource: '*'
+    events:
+      - http:
+          method: post
+          path: brewRecipes/{recipeId}/steps
+          cors: true
+          authorizer: Auth
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Create a Recipe Step
+            description: Create a recipe step for a V60 Brew Recipe
+            requestModels:
+              'application/json': CreateRecipeStepRequest
 
-        UpdateRecipeStep:
-          handler: src/brew-recipes/lambda/http/updateRecipeStep.handler
-          iamRoleStatements:
-            - Effect: Allow
-              Action:
-                - dynamodb:UpdateItem
-              Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.RECIPE_STEPS_TABLE}
-            - Effect: Allow
-              Action:
-                - xray:PutTraceSegments
-                - xray:PutTelemetryRecords
-              Resource: '*'
-            - Effect: Allow
-              Action:
-                - cloudwatch:PutMetricData
-              Resource: '*'
-          events:
-            - http:
-                method: patch
-                path: brewRecipes/{recipeId}/steps/{stepId}
-                cors: true
-                authorizer: Auth
-                reqValidatorName: RequestBodyValidator
-                documentation:
-                  summary: Update a Recipe Step
-                  description: Update a recipe step for a V60 Brew Recipe
-                  requestModels:
-                    'application/json': UpdateRecipeStepRequest
+  UpdateRecipeStep:
+    handler: src/brew-recipes/lambda/http/updateRecipeStep.handler
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.RECIPE_STEPS_TABLE}
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource: '*'
+      - Effect: Allow
+        Action:
+          - cloudwatch:PutMetricData
+        Resource: '*'
+    events:
+      - http:
+          method: patch
+          path: brewRecipes/{recipeId}/steps/{stepId}
+          cors: true
+          authorizer: Auth
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Update a Recipe Step
+            description: Update a recipe step for a V60 Brew Recipe
+            requestModels:
+              'application/json': UpdateRecipeStepRequest
 
-        DeleteRecipeStep:
-          handler: src/brew-recipes/lambda/http/deleteRecipeStep.handler
-          iamRoleStatements:
-            - Effect: Allow
-              Action:
-                - dynamodb:DeleteItem
-              Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.RECIPE_STEPS_TABLE}
-            - Effect: Allow
-              Action:
-                - xray:PutTraceSegments
-                - xray:PutTelemetryRecords
-              Resource: '*'
-            - Effect: Allow
-              Action:
-                - cloudwatch:PutMetricData
-              Resource: '*'
-          events:
-            - http:
-                method: delete
-                path: brewRecipes/{recipeId}/steps/{stepId}
-                cors: true
-                authorizer: Auth
-                documentation:
-                  summary: Delete a Recipe Step
-                  description: Delete a Step for a V60 Brew Recipe
+  DeleteRecipeStep:
+    handler: src/brew-recipes/lambda/http/deleteRecipeStep.handler
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:DeleteItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.RECIPE_STEPS_TABLE}
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource: '*'
+      - Effect: Allow
+        Action:
+          - cloudwatch:PutMetricData
+        Resource: '*'
+    events:
+      - http:
+          method: delete
+          path: brewRecipes/{recipeId}/steps/{stepId}
+          cors: true
+          authorizer: Auth
+          documentation:
+            summary: Delete a Recipe Step
+            description: Delete a Step for a V60 Brew Recipe
 
-        GenerateUploadUrl:
-          handler: src/brew-recipes/lambda/http/generateUploadUrl.handler
-          iamRoleStatements:
-            - Effect: Allow
-              Action:
-                - s3:GetObject
-                - s3:PutObject
-              Resource: arn:aws:s3:::${self:provider.environment.RECIPE_STEP_RAW_IMAGES_BUCKET}/*
-            - Effect: Allow
-              Action:
-                - xray:PutTraceSegments
-                - xray:PutTelemetryRecords
-              Resource: '*'
-            - Effect: Allow
-              Action:
-                - cloudwatch:PutMetricData
-              Resource: '*'
-          events:
-            - http:
-                method: post
-                path: brewRecipes/{recipeId}/steps/${stepId}/image
-                cors: true
-                authorizer: Auth
-                documentation:
-                  summary: Get a Signed Url to Upload an Image
-                  description: Returns a signed Url that allows an image of the Recipe Step to be uploaded
+  GenerateUploadUrl:
+    handler: src/brew-recipes/lambda/http/generateUploadUrl.handler
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:GetObject
+          - s3:PutObject
+        Resource: arn:aws:s3:::${self:provider.environment.RECIPE_STEP_RAW_IMAGES_BUCKET}/*
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource: '*'
+      - Effect: Allow
+        Action:
+          - cloudwatch:PutMetricData
+        Resource: '*'
+    events:
+      - http:
+          method: post
+          path: brewRecipes/{recipeId}/steps/${stepId}/image
+          cors: true
+          authorizer: Auth
+          documentation:
+            summary: Get a Signed Url to Upload an Image
+            description: Returns a signed Url that allows an image of the Recipe Step to be uploaded
 
-        ResizeImageOnUpload:
-          handler: src/brew-recipes/lambda/sns/resizeAndSaveImage.handler
-          iamRoleStatements:
-            - Effect: Allow
-              Action:
-                - s3:GetObject
-                - s3:PutObject
-            - Effect: Allow
-              Action:
-                - xray:PutTraceSegments
-                - xray:PutTelemetryRecords
-              Resource: '*'
-            - Effect: Allow
-              Action:
-                - cloudwatch:PutMetricData
-              Resource: '*'
-          events:
-            - sns:
-                topicName: ${self:custom.recipeStepImageUploadTopic}
-                arn:
-                  Fn::Join:
-                    - ':'
-                    - - arn:aws:sns
-                      - Ref: AWS::Region
-                      - Ref: AWS::AccountId
-                      - ${self:custom.recipeStepImageUploadTopic}
+  ResizeImageOnUpload:
+    handler: src/brew-recipes/lambda/sns/resizeAndSaveImage.handler
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:GetObject
+          - s3:PutObject
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource: '*'
+      - Effect: Allow
+        Action:
+          - cloudwatch:PutMetricData
+        Resource: '*'
+    events:
+      - sns:
+          topicName: ${self:custom.recipeStepImageUploadTopic}
+          arn:
+            Fn::Join:
+              - ':'
+              - - arn:aws:sns
+                - Ref: AWS::Region
+                - Ref: AWS::AccountId
+                - ${self:custom.recipeStepImageUploadTopic}
 
-        DeleteRawImage:
-          handler: src/brew-recipes/lambda/sns/deleteRawImage.handler
-          iamRoleStatements:
-            - Effect: Allow
-              Action:
-                - s3:DeleteObject
-            - Effect: Allow
-              Action:
-                - xray:PutTraceSegments
-                - xray:PutTelemetryRecords
-              Resource: '*'
-            - Effect: Allow
-              Action:
-                - cloudwatch:PutMetricData
-              Resource: '*'
-          events:
-            - sns:
-                topicName: ${self:custom.imageResizedTopic}
-                arn:
-                  Fn::Join:
-                    - ':'
-                    - - arn:aws:sns
-                      - Ref: AWS::Region
-                      - Ref: AWS::AccountId
-                      - ${self:custom.imageResizedTopic}
+  DeleteRawImage:
+    handler: src/brew-recipes/lambda/sns/deleteRawImage.handler
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:DeleteObject
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource: '*'
+      - Effect: Allow
+        Action:
+          - cloudwatch:PutMetricData
+        Resource: '*'
+    events:
+      - sns:
+          topicName: ${self:custom.imageResizedTopic}
+          arn:
+            Fn::Join:
+              - ':'
+              - - arn:aws:sns
+                - Ref: AWS::Region
+                - Ref: AWS::AccountId
+                - ${self:custom.imageResizedTopic}
 
 resources:
   Resources:
