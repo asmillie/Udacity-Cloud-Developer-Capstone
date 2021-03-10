@@ -16,5 +16,5 @@ export const handler: SNSHandler = async (event: SNSEvent) => {
         }
     }
 
-    await saveExecutionTimeMetric('ResizeImage', startTimeInMS);
+    await saveExecutionTimeMetric('ResizeAndSaveImage', startTimeInMS);
 }
