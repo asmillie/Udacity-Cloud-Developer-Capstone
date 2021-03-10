@@ -156,13 +156,9 @@ functions:
     events:
       - http:
           method: get
-          path: recipeSteps
+          path: brewRecipes/{recipeId}/steps
           cors: true
           authorizer: Auth
-          request:
-            parameters:
-              querystrings:
-                recipeId: true
 
   CreateRecipeStep:
     handler: src/brew-recipes/lambda/http/createRecipeStep.handler
@@ -183,7 +179,7 @@ functions:
     events:
       - http:
           method: post
-          path: recipeSteps
+          path: brewRecipes/{recipeId}/steps
           cors: true
           authorizer: Auth
           request:
@@ -209,13 +205,10 @@ functions:
     events:
       - http:
           method: patch
-          path: recipeSteps/{stepId}
+          path: brewRecipes/{recipeId}/steps/{stepId}
           cors: true
           authorizer: Auth
           request:
-            parameters:
-              paths:
-                stepId: true
             schema:
               application/json: ${file(models/update-recipe-step-request.json)}
 
@@ -238,13 +231,9 @@ functions:
     events:
       - http:
           method: delete
-          path: recipeSteps/{stepId}
+          path: brewRecipes/{recipeId}/steps/{stepId}
           cors: true
           authorizer: Auth
-          request:
-            parameters:
-              paths:
-                stepId: true
 
   GenerateUploadUrl:
     handler: src/brew-recipes/lambda/http/generateUploadUrl.handler

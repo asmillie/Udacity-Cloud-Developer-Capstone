@@ -3,15 +3,11 @@
     "title": "todo",
     "type": "object",
     "properties": {
-        "recipeId": {
-            "type": "string"
-        },
         "instructions": {
             "type": "string"
         },
         "durationInMS": {
             "type": "integer"
         }
-    },
-    "required": ["recipeId"]
+    }
 }
