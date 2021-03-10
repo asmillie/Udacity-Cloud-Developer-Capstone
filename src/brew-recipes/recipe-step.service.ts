@@ -221,4 +221,48 @@ export class RecipeStepService {
             Expires: parseInt(this.urlExpiration, 10)
         });
     }
+
+    /**
+     * Saves a thumbnail image for a recipe step to an AWS S3 Bucket
+     * @param image Thumbnail image as a Buffer
+     * @param key Corresponding stepId to save image under
+     */
+    async saveThumbnail(image: Buffer, key: string): Promise<void> {
+        await this.s3Client.putObject({
+            Bucket: this.thumbnailsBucketName,
+            Key: `${key}.jpg`,
+            Body: image
+        }).promise();
+    }
+
+    /**
+     * Gets the raw image for a recipe step from AWS S3
+     * @param key Key of image to get
+     * @returns Image as a Buffer
+     */
+    async getRawImage(key: string): Promise<Buffer> {
+        return await this.s3Client.getObject({
+            Bucket: this.rawImagesBucketName,
+            Key: key
+        }).promise().then(data => {
+            return data.Body as Buffer;
+        }, err => {
+            this.logger.error(`Error getting image: ${err}`);
+            throw new Error(`Error retrieving image: ${err}`);
+        });
+    }
+
+    /**
+     * Deletes raw image from AWS S3
+     * @param key Key of image to delete
+     */
+    async deleteRawImage(key: string): Promise<void> {
+        await this.s3Client.deleteObject({
+            Bucket: this.rawImagesBucketName,
+            Key: key
+        }).promise().catch(err => {
+            this.logger.error(`Error deleting raw image with key ${key}: ${err}`);
+            throw new Error(`Error deleting raw image with key ${key}: ${err}`);
+        })
+    }
 }

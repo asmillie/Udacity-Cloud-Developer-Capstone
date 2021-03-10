@@ -33,4 +33,16 @@ export class RecipeStepRepository {
     getUploadUrl(stepId: string): string {
         return this.recipeStepService.getUploadUrl(stepId);
     }
+
+    async saveThumbnail(image: Buffer, key: string): Promise<void> {
+        return await this.recipeStepService.saveThumbnail(image, key);
+    }
+
+    async getRawImage(key: string): Promise<Buffer> {
+        return await this.recipeStepService.getRawImage(key);
+    }
+
+    async deleteRawImage(key: string): Promise<void> {
+        return await this.deleteRawImage(key);
+    }
 }
