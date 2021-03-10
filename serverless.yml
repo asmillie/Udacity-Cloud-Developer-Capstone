@@ -19,8 +19,8 @@ provider:
     SIGNED_URL_EXPIRATION: 300
     BREW_RECIPES_TABLE: BrewRecipes-${self:provider.stage}
     RECIPE_STEPS_TABLE: RecipeSteps-${self:provider.stage}
-    RECIPE_STEP_THUMBNAILS_BUCKET: RecipeStepThumbnails-${self:provider.stage}
-    RECIPE_STEP_RAW_IMAGES_BUCKET: RecipeStepRawImage-${self:provider.stage}
+    RECIPE_STEP_THUMBNAILS_BUCKET: recipe-step-thumbnails-${self:provider.stage}
+    RECIPE_STEP_RAW_IMAGES_BUCKET: recipe-step-raw-images-${self:provider.stage}
     METRIC_NAMESPACE: ${self:service}-${self:provider.stage}
 
 custom:
