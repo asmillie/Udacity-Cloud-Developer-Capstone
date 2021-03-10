@@ -2,9 +2,7 @@ service: udacity-capstone
 
 plugins:
   - serverless-webpack
-  - serverless-iam-roles-per-function  
-  - serverless-reqvalidator-plugin
-  - serverless-aws-documentation
+  - serverless-iam-roles-per-function
 
 provider:
   name: aws
@@ -30,25 +28,6 @@ custom:
     webpackConfig: 'webpack.config.js'
     includeModules: true
     packager: 'npm'
-  documentation:
-    api:
-      info:
-        version: v1.0.0
-        title: Coffee Brewing Recipes for the Hario V60
-        description: Search, create and share user-made recipes for brewing pour-over coffee with the Hario V60
-    models:
-      - name: CreateBrewRecipeRequest
-        contentType: application/json
-        schema: ${file(models/create-brew-recipe-request.json)}
-      - name: UpdateBrewRecipeRequest
-        contentType: application/json
-        schema: ${file(models/update-brew-recipe-request.json)}
-      - name: CreateRecipeStepRequest
-        contentType: application/json
-        schema: ${file(models/create-recipe-step-request.json)}
-      - name: UpdateRecipeStepRequest
-        contentType: application/json
-        schema: ${file(models/update-recipe-step-request.json)}
   recipeStepImageUploadTopic: RecipeStepImageUploadTopic-${self:provider.stage}
   imageResizedTopic: ImageResizedTopic-${self:provider.stage}
 
@@ -81,9 +60,6 @@ functions:
           path: brewRecipes
           cors: true
           authorizer: Auth
-          documentation:
-            summary: Get all Brew Recipes
-            description: Get all V60 Brew Recipes for the current logged-in User
 
   CreateBrewRecipe:
     handler: src/brew-recipes/lambda/http/createBrewRecipe.handler
@@ -107,12 +83,9 @@ functions:
           path: brewRecipes
           cors: true
           authorizer: Auth
-          reqValidatorName: RequestBodyValidator
-          documentation:
-            summary: Create a new V60 Brew Recipe
-            description: Create a new Hario V60 Brew Recipes for the current logged-in User
-            requestModels:
-              'application/json': CreateBrewRecipeRequest
+          request:
+            schema:
+              application/json: ${file(src/models/create-brew-recipe-request.json)}
 
   UpdateBrewRecipe:
     handler: src/brew-recipes/lambda/http/updateBrewRecipe.handler
@@ -136,12 +109,9 @@ functions:
           path: brewRecipes/{recipeId}
           cors: true
           authorizer: Auth
-          reqValidatorName: RequestBodyValidator
-          documentation:
-            summary: Update a V60 Brew Recipe
-            description: Update a Hario V60 Brew Recipe belonging to the current logged-in User
-            requestModels:
-              'application/json': UpdateBrewRecipeRequest
+          request:
+            schema:
+              application/json: ${file(src/models/update-brew-recipe-request.json)}
 
   DeleteBrewRecipe:
     handler: src/brew-recipes/lambda/http/deleteBrewRecipe.handler
@@ -165,9 +135,6 @@ functions:
           path: brewRecipes/{recipeId}
           cors: true
           authorizer: Auth
-          documentation:
-            summary: Delete a V60 Brew Recipe
-            description: Delete a Hario V60 Brew Recipe belonging to the current logged-in User
 
   GetRecipeSteps:
     handler: src/brew-recipes/lambda/http/getRecipeSteps.handler
@@ -192,9 +159,6 @@ functions:
           path: brewRecipes/{recipeId}/steps
           cors: true
           authorizer: Auth
-          documentation:
-            summary: Get all Recipe Steps by Recipe Id
-            description: Get all Recipe Steps for a V60 Brew Recipe
 
   CreateRecipeStep:
     handler: src/brew-recipes/lambda/http/createRecipeStep.handler
@@ -218,12 +182,9 @@ functions:
           path: brewRecipes/{recipeId}/steps
           cors: true
           authorizer: Auth
-          reqValidatorName: RequestBodyValidator
-          documentation:
-            summary: Create a Recipe Step
-            description: Create a recipe step for a V60 Brew Recipe
-            requestModels:
-              'application/json': CreateRecipeStepRequest
+          request:
+            schema:
+              application/json: ${file(src/models/create-recipe-step-request.json)}
 
   UpdateRecipeStep:
     handler: src/brew-recipes/lambda/http/updateRecipeStep.handler
@@ -247,12 +208,9 @@ functions:
           path: brewRecipes/{recipeId}/steps/{stepId}
           cors: true
           authorizer: Auth
-          reqValidatorName: RequestBodyValidator
-          documentation:
-            summary: Update a Recipe Step
-            description: Update a recipe step for a V60 Brew Recipe
-            requestModels:
-              'application/json': UpdateRecipeStepRequest
+          request:
+            schema:
+              application/json: ${file(src/models/update-recipe-step-request.json)}
 
   DeleteRecipeStep:
     handler: src/brew-recipes/lambda/http/deleteRecipeStep.handler
@@ -276,9 +234,6 @@ functions:
           path: brewRecipes/{recipeId}/steps/{stepId}
           cors: true
           authorizer: Auth
-          documentation:
-            summary: Delete a Recipe Step
-            description: Delete a Step for a V60 Brew Recipe
 
   GenerateUploadUrl:
     handler: src/brew-recipes/lambda/http/generateUploadUrl.handler
@@ -303,9 +258,6 @@ functions:
           path: brewRecipes/{recipeId}/steps/${stepId}/image
           cors: true
           authorizer: Auth
-          documentation:
-            summary: Get a Signed Url to Upload an Image
-            description: Returns a signed Url that allows an image of the Recipe Step to be uploaded
 
   ResizeImageOnUpload:
     handler: src/brew-recipes/lambda/sns/resizeAndSaveImage.handler
@@ -491,15 +443,6 @@ resources:
                   AWS:SourceArn: arn:aws:s3:::${self:provider.environment.RECIPE_STEP_THUMBNAILS_BUCKET}
         Topics:
           - !Ref ImageResizedTopic
-
-    RequestBodyValidator:
-      Type: AWS::ApiGateway::RequestValidator
-      Properties:
-        RestApiId: 
-          Ref: ApiGatewayRestApi
-        Name: 'request-body-validator'
-        ValidateRequestBody: true
-        ValidateRequestParameters: false
 
     GatewayResponseDefault4XX:
       Type: AWS::ApiGateway::GatewayResponse
