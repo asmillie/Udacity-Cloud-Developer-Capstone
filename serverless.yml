@@ -2,9 +2,9 @@ service: udacity-capstone
 
 plugins:
   - serverless-webpack
-  - serverless-iam-roles-per-function
-  - serverless-aws-documentation
+  - serverless-iam-roles-per-function  
   - serverless-reqvalidator-plugin
+  - serverless-aws-documentation
 
 provider:
   name: aws
@@ -55,7 +55,7 @@ custom:
 functions:
 
   Auth:
-    handler: src/lambda/auth/handler.handler
+    handler: src/auth/lambda/auth0Authorizer.handler
     iamRoleStatements: []
 
   GetBrewRecipes:
@@ -313,7 +313,11 @@ functions:
       - Effect: Allow
         Action:
           - s3:GetObject
+        Resource: arn:aws:s3:::${self:provider.environment.RECIPE_STEP_RAW_IMAGES_BUCKET}/*
+      - Effect: Allow
+        Action:
           - s3:PutObject
+        Resource: arn:aws:s3:::${self:provider.environment.RECIPE_STEP_THUMBNAILS_BUCKET}/*
       - Effect: Allow
         Action:
           - xray:PutTraceSegments
@@ -340,6 +344,7 @@ functions:
       - Effect: Allow
         Action:
           - s3:DeleteObject
+        Resource: arn:aws:s3:::${self:provider.environment.RECIPE_STEP_RAW_IMAGES_BUCKET}/*
       - Effect: Allow
         Action:
           - xray:PutTraceSegments
@@ -496,3 +501,14 @@ resources:
         ValidateRequestBody: true
         ValidateRequestParameters: false
 
+    GatewayResponseDefault4XX:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseType: DEFAULT_4XX
+        RestApiId: 
+          Ref: 'ApiGatewayRestApi'
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
+          
