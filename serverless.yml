@@ -85,7 +85,7 @@ functions:
           authorizer: Auth
           request:
             schema:
-              application/json: ${file(src/models/create-brew-recipe-request.json)}
+              application/json: ${file(models/create-brew-recipe-request.json)}
 
   UpdateBrewRecipe:
     handler: src/brew-recipes/lambda/http/updateBrewRecipe.handler
@@ -111,7 +111,7 @@ functions:
           authorizer: Auth
           request:
             schema:
-              application/json: ${file(src/models/update-brew-recipe-request.json)}
+              application/json: ${file(models/update-brew-recipe-request.json)}
 
   DeleteBrewRecipe:
     handler: src/brew-recipes/lambda/http/deleteBrewRecipe.handler
@@ -184,7 +184,7 @@ functions:
           authorizer: Auth
           request:
             schema:
-              application/json: ${file(src/models/create-recipe-step-request.json)}
+              application/json: ${file(models/create-recipe-step-request.json)}
 
   UpdateRecipeStep:
     handler: src/brew-recipes/lambda/http/updateRecipeStep.handler
@@ -210,7 +210,7 @@ functions:
           authorizer: Auth
           request:
             schema:
-              application/json: ${file(src/models/update-recipe-step-request.json)}
+              application/json: ${file(models/update-recipe-step-request.json)}
 
   DeleteRecipeStep:
     handler: src/brew-recipes/lambda/http/deleteRecipeStep.handler
