@@ -1,5 +1,5 @@
 import * as AWS from 'aws-sdk';
-import { DeleteItemInput, DocumentClient, PutItemInput, QueryInput, UpdateItemInput } from 'aws-sdk/clients/dynamodb';
+import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { v4 as uuid } from 'uuid';
 import { createLogger } from '../utils/logger';
 import { BrewRecipeItem } from './models/BrewRecipeItem';
@@ -29,13 +29,12 @@ export class BrewRecipeService {
             throw new Error(`Missing user Id`);
         }
 
-        const params: QueryInput = {
+        const params = {
             TableName: this.brewRecipeTbl,
             KeyConditionExpression: 'userId = :userId',
             ExpressionAttributeValues: {
-                ':userId': { S: userId }
-            },
-            ScanIndexForward: false
+                ':userId': userId
+            }
         };
 
         return await this.docClient.query(params)
@@ -57,22 +56,23 @@ export class BrewRecipeService {
     async createBrewRecipe(userId: string, createBrewRecipeRequest: CreateBrewRecipeRequest): Promise<BrewRecipeItem> {
         this.logger.info(`Creating Brew Recipe for User Id ${userId}`);
 
+        const { title } = createBrewRecipeRequest;
+        const recipeId = uuid();
+        const createdAt = new Date().toISOString();
+        const updatedAt = new Date().toISOString();
+
         const newBrewRecipeItem: BrewRecipeItem = {
             userId,
-            recipeId: uuid(),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            ...createBrewRecipeRequest
+            recipeId,
+            createdAt,
+            updatedAt,
+            title
         };
 
-        const params: PutItemInput = {
+        const params = {
             TableName: this.brewRecipeTbl,
             Item: {
-                userId: { S: newBrewRecipeItem.userId },
-                recipeId: { S: newBrewRecipeItem.recipeId },
-                createdAt: { S: newBrewRecipeItem.createdAt },
-                updatedAt: { S: newBrewRecipeItem.updatedAt },
-                title: { S: newBrewRecipeItem.title }
+                ...newBrewRecipeItem
             }
         };
 
@@ -101,16 +101,16 @@ export class BrewRecipeService {
         const { title } = updateBrewRecipeRequest;
         this.logger.info(`Updating brew recipe for recipe id ${recipeId}`);        
 
-        const params: UpdateItemInput = {
+        const params = {
             TableName: this.brewRecipeTbl,
             Key: {
-                'userId': { S: userId },
-                'recipeId': { S: recipeId }
+                'userId': userId,
+                'recipeId': recipeId
             },
             UpdateExpression: 'set title = :title, updatedAt = :updatedAt',
             ExpressionAttributeValues: {
-                ':title': { S: title },
-                ':updatedAt': { S: new Date().toISOString() }
+                ':title': title,
+                ':updatedAt': new Date().toISOString()
             },
             ReturnValues: 'ALL_NEW'
         };
@@ -134,11 +134,11 @@ export class BrewRecipeService {
     async deleteBrewRecipeById(userId: string, recipeId: string): Promise<BrewRecipeItem> {
         this.logger.info(`Deleting brew recipe for recipe id ${recipeId}`);
 
-        const params: DeleteItemInput = {
+        const params = {
             TableName: this.brewRecipeTbl,
             Key: {
-                'userId': { S: userId },
-                'recipeId': { S: recipeId }
+                'userId': userId,
+                'recipeId': recipeId
             },
             ReturnValues: 'ALL_OLD'
         };
