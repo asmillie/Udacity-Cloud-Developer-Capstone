@@ -10,7 +10,10 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     const createBrewRecipeReq: CreateBrewRecipeRequest = JSON.parse(event.body);
 
     const brewRecipeRepository = new BrewRecipeRepository();
-    const recipe = await brewRecipeRepository.createBrewRecipe(userId, createBrewRecipeReq);
+    const recipe = await brewRecipeRepository.createBrewRecipe(userId, createBrewRecipeReq).catch(async error => {
+        await saveExecutionTimeMetric('CreateBrewRecipe', startTimeMS);
+        return prepareApiResponse(400, { error })
+    });
 
     await saveExecutionTimeMetric('CreateBrewRecipe', startTimeMS);
 

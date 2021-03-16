@@ -8,7 +8,10 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     const recipeId = event.pathParameters.recipeId;
     const recipeStepRepository = new RecipeStepRepository();
 
-    const steps = await recipeStepRepository.getAllRecipeStepsByRecipeId(recipeId);
+    const steps = await recipeStepRepository.getAllRecipeStepsByRecipeId(recipeId).catch(async error => {
+        await saveExecutionTimeMetric('GetRecipeSteps', startTimeMS);
+        return prepareApiResponse(400, { error })
+    });
 
     await saveExecutionTimeMetric('GetRecipeSteps', startTimeMS);
 

@@ -7,7 +7,10 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     const startTimeMS = new Date().getTime();
     const userId = getUserId(event);
     const brewRecipeRepository = new BrewRecipeRepository();
-    const recipes = await brewRecipeRepository.getAllBrewRecipesByUserId(userId);
+    const recipes = await brewRecipeRepository.getAllBrewRecipesByUserId(userId).catch(async error => {
+        await saveExecutionTimeMetric('GetBrewRecipes', startTimeMS);
+        return prepareApiResponse(400, { error })
+    });
 
     await saveExecutionTimeMetric('GetBrewRecipes', startTimeMS);
 

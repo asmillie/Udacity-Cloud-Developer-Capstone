@@ -9,7 +9,10 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     const stepId = event.pathParameters.stepId;
 
     const recipeStepRepository = new RecipeStepRepository();
-    const step = await recipeStepRepository.deleteRecipeStepById(recipeId, stepId);
+    const step = await recipeStepRepository.deleteRecipeStepById(recipeId, stepId).catch(async error => {
+        await saveExecutionTimeMetric('DeleteRecipeStep', startTimeMS);
+        return prepareApiResponse(400, { error })
+    });
 
     await saveExecutionTimeMetric('DeleteRecipeStep', startTimeMS);
 
