@@ -169,7 +169,9 @@ export class RecipeStepService {
         return await this.docClient.delete(params)
             .promise()
             .then(data => {
-                return data.$response.data as RecipeStepItem;
+                if (data.$response.data) {
+                    return data.$response.data.Attributes as RecipeStepItem;
+                }                
             }, err => {
                 this.logger.error(`Error occurred while attempting to delete recipe step for step id ${stepId}: ${err}`);
                 throw new Error('Error occurred during delete operation');
