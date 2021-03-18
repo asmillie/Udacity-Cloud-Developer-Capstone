@@ -10,12 +10,16 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     const createRecipeStepRequest: CreateRecipeStepRequest = JSON.parse(event.body);
 
     const recipeStepRepository = new RecipeStepRepository();
-    const step = await recipeStepRepository.createRecipeStep(recipeId, createRecipeStepRequest).catch(async error => {
-        await saveExecutionTimeMetric('CreateRecipeStep', startTimeMS);
-        return prepareApiResponse(400, { error })
-    });
+
+    const response = await recipeStepRepository.createRecipeStep(recipeId, createRecipeStepRequest)
+        .then(step => {
+            return prepareApiResponse(201, { step });
+        })
+        .catch(error => {
+            return prepareApiResponse(400, { error })
+        });
 
     await saveExecutionTimeMetric('CreateRecipeStep', startTimeMS);
 
-    return prepareApiResponse(201, { step });
+    return response;
 }

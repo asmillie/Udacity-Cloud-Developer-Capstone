@@ -15,7 +15,7 @@ export class RecipeStepRepository {
     }
 
     async createRecipeStep(recipeId: string, createRecipeStepRequest: CreateRecipeStepRequest): Promise<RecipeStepItem> {
-        return await this.createRecipeStep(recipeId, createRecipeStepRequest);
+        return await this.recipeStepService.createRecipeStep(recipeId, createRecipeStepRequest);
     }
 
     async updateRecipeStep(recipeId: string, stepId: string, updateRecipeStepRequest: UpdateRecipeStepRequest): Promise<RecipeStepItem> {
@@ -43,6 +43,6 @@ export class RecipeStepRepository {
     }
 
     async deleteRawImage(key: string): Promise<void> {
-        return await this.deleteRawImage(key);
+        return await this.recipeStepService.deleteRawImage(key);
     }
 }

@@ -1,6 +1,7 @@
 import * as AWS from 'aws-sdk';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { v4 as uuid } from 'uuid';
+import winston from 'winston';
 import { createLogger } from '../utils/logger';
 import { BrewRecipeItem } from './models/BrewRecipeItem';
 import { CreateBrewRecipeRequest } from './requests/CreateBrewRecipeRequest';
@@ -8,8 +9,8 @@ import { UpdateBrewRecipeRequest } from './requests/UpdateBrewRecipeRequest';
 
 export class BrewRecipeService {
     private readonly docClient: DocumentClient;
-    private readonly brewRecipeTbl;
-    private readonly logger;
+    private readonly brewRecipeTbl: string;
+    private readonly logger: winston.Logger;
     
     constructor () {
         this.docClient = new AWS.DynamoDB.DocumentClient();
@@ -146,7 +147,9 @@ export class BrewRecipeService {
         return await this.docClient.delete(params)
             .promise()
             .then(data => {
-                return data.$response.data as BrewRecipeItem;
+                if (data.$response.data) {
+                    return data.$response.data.Attributes as BrewRecipeItem;
+                }                
             }, err => {
                 this.logger.error(`Error occurred while attempting to delete recipe id ${recipeId}: ${err}`);
                 throw new Error('Error occurred during delete operation');

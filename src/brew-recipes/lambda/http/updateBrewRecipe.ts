@@ -11,12 +11,15 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     const updateBrewRecipeReq: UpdateBrewRecipeRequest = JSON.parse(event.body);
 
     const brewRecipeRepository = new BrewRecipeRepository();
-    const recipe = await brewRecipeRepository.updateBrewRecipe(userId, recipeId, updateBrewRecipeReq).catch(async error => {
-        await saveExecutionTimeMetric('UpdateBrewRecipe', startTimeMS);
-        return prepareApiResponse(400, { error })
-    });
+    const response = await brewRecipeRepository.updateBrewRecipe(userId, recipeId, updateBrewRecipeReq)
+        .then(recipe => {
+            return prepareApiResponse(200, { recipe });
+        })
+        .catch(error => {
+            return prepareApiResponse(400, { error })
+        });
 
     await saveExecutionTimeMetric('UpdateBrewRecipe', startTimeMS);
 
-    return prepareApiResponse(200, { recipe });
+    return response;
 }

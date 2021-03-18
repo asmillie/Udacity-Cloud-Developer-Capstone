@@ -15,14 +15,14 @@ export class BrewRecipeRepository {
     }
 
     async createBrewRecipe(userId: string, createBrewRecipeRequest: CreateBrewRecipeRequest): Promise<BrewRecipeItem> {
-        return await this.createBrewRecipe(userId, createBrewRecipeRequest);
+        return await this.brewRecipeService.createBrewRecipe(userId, createBrewRecipeRequest);
     }
 
     async updateBrewRecipe(userId: string, recipeId: string, updateBrewRecipeRequest: UpdateBrewRecipeRequest): Promise<BrewRecipeItem> {
-        return await this.updateBrewRecipe(userId, recipeId, updateBrewRecipeRequest);
+        return await this.brewRecipeService.updateBrewRecipe(userId, recipeId, updateBrewRecipeRequest);
     }
 
     async deleteBrewRecipeById(userId: string, recipeId: string): Promise<BrewRecipeItem> {
-        return await this.deleteBrewRecipeById(userId, recipeId);
+        return await this.brewRecipeService.deleteBrewRecipeById(userId, recipeId);
     }
 }

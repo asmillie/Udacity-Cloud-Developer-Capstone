@@ -38,11 +38,11 @@ export class RecipeStepService {
             throw new Error(`No recipe id provided while getting recipe steps`);
         }
 
-        const params: QueryInput = {
+        const params = {
             TableName: this.recipeStepTbl,
             KeyConditionExpression: 'recipeId = :recipeId',
             ExpressionAttributeValues: {
-                ':recipeId': { S: recipeId }
+                ':recipeId': recipeId
             },
             ScanIndexForward: false
         };
@@ -73,16 +73,10 @@ export class RecipeStepService {
             ...createRecipeStepRequest
         };
 
-        const params: PutItemInput = {
+        const params = {
             TableName: this.recipeStepTbl,
             Item: {
-                recipeId: { S: recipeId },
-                position: { N: newRecipeStepItem.position.toString() },
-                stepId: { S: newRecipeStepItem.stepId },
-                createdAt: { S: newRecipeStepItem.createdAt },
-                updatedAt: { S: newRecipeStepItem.updatedAt },
-                instructions: { S: newRecipeStepItem.instructions },
-                durationInMS: { N: newRecipeStepItem.durationInMS.toString() },
+                ...newRecipeStepItem
             }
         };
 
@@ -119,23 +113,23 @@ export class RecipeStepService {
 
         let UpdateExpression = 'set updatedAt = :updatedAt';
         const ExpressionAttributeValues = {
-            ':updatedAt': { S: new Date().toISOString() }
+            ':updatedAt': new Date().toISOString()
         };
         if (updateRecipeStepRequest.instructions) {
             UpdateExpression += ', instructions = :instructions';
-            ExpressionAttributeValues['instructions'] = updateRecipeStepRequest.instructions;
+            ExpressionAttributeValues[':instructions'] = updateRecipeStepRequest.instructions;
         }
 
         if (updateRecipeStepRequest.durationInMS) {
             UpdateExpression += ', durationInMS = :durationInMS';
-            ExpressionAttributeValues['durationInMS'] = updateRecipeStepRequest.durationInMS;
+            ExpressionAttributeValues[':durationInMS'] = updateRecipeStepRequest.durationInMS;
         }
 
-        const params: UpdateItemInput = {
+        const params = {
             TableName: this.recipeStepTbl,
             Key: {
-                'recipeId': { S: recipeId },
-                'stepId': { S: stepId }
+                'recipeId': recipeId,
+                'stepId': stepId
             },
             UpdateExpression,
             ExpressionAttributeValues,
@@ -145,7 +139,9 @@ export class RecipeStepService {
         return await this.docClient.update(params)
             .promise()
             .then(data => {
-                return data.$response.data as RecipeStepItem;
+                if (data.$response.data) {
+                    return data.$response.data.Attributes as RecipeStepItem;
+                }                
             }, err => {
                 this.logger.error(`Error during update operation: ${err}`);
                 throw new Error(`Error updating recipe step id ${stepId}: ${err}`);
@@ -161,11 +157,11 @@ export class RecipeStepService {
     async deleteRecipeStepById(recipeId: string, stepId: string): Promise<RecipeStepItem> {
         this.logger.info(`Delete recipe step for id ${stepId}`);
 
-        const params: DeleteItemInput = {
+        const params = {
             TableName: this.recipeStepTbl,
             Key: {
-                'recipeId': { S: recipeId },
-                'stepId': { S: stepId }
+                'recipeId': recipeId,
+                'stepId': stepId
             },
             ReturnValues: 'ALL_OLD'
         };
@@ -188,15 +184,15 @@ export class RecipeStepService {
     async saveThumbnailUrl(recipeId: string, stepId: string): Promise<void> {
         const thumbnailUrl = `http://${this.thumbnailsBucketName}.s3.amazonaws.com/${stepId}`;
 
-        const params: UpdateItemInput = {
+        const params = {
             TableName: this.recipeStepTbl,
             Key: {
-                'recipeId': { S: recipeId },
-                'stepId': { S: stepId }
+                'recipeId': recipeId,
+                'stepId': stepId
             },
             UpdateExpression: 'set thumbnailUrl = :thumbnailUrl',
             ExpressionAttributeValues: {
-                ':thumbnailUrl': { S: thumbnailUrl }
+                ':thumbnailUrl': thumbnailUrl
             }
         };
 
