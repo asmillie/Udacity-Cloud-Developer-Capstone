@@ -375,6 +375,21 @@ resources:
                 - '*'
               MaxAge: 3000
 
+    PublicReadBucketObjectsPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref RecipeStepThumbnailsBucket
+        PolicyDocument:
+          Id: RecipeStepThumbnailsPolicy
+          Version: "2012-10-17"
+          Statement:
+            - Sid: PublicReadForGetBucketObjects
+              Effect: Allow
+              Principal: '*'
+              Action: 's3:GetObject'
+              Resource: 'arn:aws:s3:::${self:provider.environment.RECIPE_STEP_THUMBNAILS_BUCKET}/*'
+          
+
     RecipeStepRawImagesBucket:
       Type: AWS::S3::Bucket
       DependsOn: RecipeStepImageUploadTopicPolicy
