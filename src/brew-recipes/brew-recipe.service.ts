@@ -119,7 +119,9 @@ export class BrewRecipeService {
         return await this.docClient.update(params)
             .promise()
             .then(data => {
-                return data.$response.data as BrewRecipeItem;
+                if (data.$response.data) {
+                    return data.$response.data.Attributes as BrewRecipeItem;
+                }                
             }, err => {
                 this.logger.error(`Error occurred during update operation: ${err}`);
                 throw new Error(`Error updating recipe id ${recipeId}: ${err}`);

@@ -1,6 +1,6 @@
 import * as AWS from 'aws-sdk';
 import { S3 } from 'aws-sdk';
-import { DeleteItemInput, DocumentClient, PutItemInput, QueryInput, UpdateItemInput } from 'aws-sdk/clients/dynamodb';
+import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { v4 as uuid } from 'uuid';
 import { createLogger } from '../utils/logger';
 import { RecipeStepItem } from './models/RecipeStepItem';
