@@ -7,7 +7,7 @@ export async function resizeImage(buffer: Buffer): Promise<Buffer> {
     return await Jimp.read(buffer)
         .then(image => {
             image.cover(56, 56);
-            return image.getBufferAsync(Jimp.AUTO.toString());
+            return image.getBufferAsync(image.getMIME());
         })
         .catch(err => {
             logger.error(`Error reading image buffer: ${err}`);
