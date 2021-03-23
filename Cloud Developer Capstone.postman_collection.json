@@ -1,0 +1,595 @@
+{
+	"info": {
+		"_postman_id": "4caa8ea6-65c2-4487-89f8-6d1369c98329",
+		"name": "Cloud Developer Capstone",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "01 - Create Brew Recipe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body is an object containing the created recipe\", function () {\r",
+							"    pm.expect(jsonData.recipe).to.be.an(\"object\");\r",
+							"    pm.expect(jsonData.recipe.recipeId).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.recipe.userId).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.recipe.createdAt).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.recipe.updatedAt).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.recipe.title).to.be.a(\"string\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Title set in the response is the one that was sent in the request\", function () {\r",
+							"    pm.expect(jsonData.recipe.title).eq(pm.collectionVariables.get(\"test_title\"));\r",
+							"});\r",
+							"\r",
+							"// Set Variables needed for other requests\r",
+							"pm.collectionVariables.set(\"test_userId\", jsonData.recipe.userId);\r",
+							"pm.collectionVariables.set(\"test_brewRecipeId\", jsonData.recipe.recipeId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"{{test_title}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host_url}}/{{endpoint_brewRecipes}}",
+					"host": [
+						"{{host_url}}"
+					],
+					"path": [
+						"{{endpoint_brewRecipes}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "02 - Update Brew Recipe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body is an object containing the updated recipe\", function () {\r",
+							"    pm.expect(jsonData.recipe).to.be.an(\"object\");\r",
+							"    pm.expect(jsonData.recipe.recipeId).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.recipe.userId).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.recipe.updatedAt).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.recipe.title).to.be.a(\"string\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Title set in the response is the one that was sent in the request\", function () {\r",
+							"    pm.expect(jsonData.recipe.title).eq(pm.collectionVariables.get(\"test_title_update\"));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"{{test_title_update}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host_url}}/{{endpoint_brewRecipes}}/{{test_brewRecipeId}}",
+					"host": [
+						"{{host_url}}"
+					],
+					"path": [
+						"{{endpoint_brewRecipes}}",
+						"{{test_brewRecipeId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "03 - Get Recipes",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"const recipes = jsonData.recipes;\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body is an array of recipe objects\", function () {\r",
+							"    pm.expect(recipes).to.be.an(\"array\");\r",
+							"    pm.expect(recipes[0]).to.have.all.keys('recipeId', 'userId', 'createdAt', 'updatedAt', 'title');\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_url}}/{{endpoint_brewRecipes}}",
+					"host": [
+						"{{host_url}}"
+					],
+					"path": [
+						"{{endpoint_brewRecipes}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "04 - Create Recipe Step",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body is an object containing the created recipe step\", function () {\r",
+							"    pm.expect(jsonData.step).to.be.an(\"object\");\r",
+							"    pm.expect(jsonData.step.recipeId).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.step.stepId).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.step.createdAt).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.step.updatedAt).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.step.position).to.be.a(\"number\");\r",
+							"    pm.expect(jsonData.step.instructions).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.step.durationInMS).to.be.a(\"number\");\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"test_recipeStepId\", jsonData.step.stepId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"position\": 0,\r\n    \"instructions\": \"{{test_step_instructions}}\",\r\n    \"durationInMS\": 0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host_url}}/{{endpoint_brewRecipes}}/{{test_brewRecipeId}}/{{endpoint_recipeSteps}}",
+					"host": [
+						"{{host_url}}"
+					],
+					"path": [
+						"{{endpoint_brewRecipes}}",
+						"{{test_brewRecipeId}}",
+						"{{endpoint_recipeSteps}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "05 - Update Recipe Step",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"const step = jsonData.step;\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body is an object containing the updated recipe step\", function () {\r",
+							"    pm.expect(step).to.be.an(\"object\");\r",
+							"    pm.expect(step.recipeId).to.be.a(\"string\");\r",
+							"    pm.expect(step.stepId).to.be.a(\"string\");\r",
+							"    pm.expect(step.createdAt).to.be.a(\"string\");\r",
+							"    pm.expect(step.updatedAt).to.be.a(\"string\");\r",
+							"    pm.expect(step.position).to.be.a(\"number\");\r",
+							"    pm.expect(step.instructions).to.be.a(\"string\");\r",
+							"    pm.expect(step.durationInMS).to.be.a(\"number\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Instructions field in the response matches what was sent in the request\", function () {\r",
+							"    pm.expect(step.instructions).to.eq(pm.collectionVariables.get(\"test_step_instruction_update\"));\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"instructions\": \"{{test_step_instruction_update}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host_url}}/{{endpoint_brewRecipes}}/{{test_brewRecipeId}}/{{endpoint_recipeSteps}}/{{test_recipeStepId}}",
+					"host": [
+						"{{host_url}}"
+					],
+					"path": [
+						"{{endpoint_brewRecipes}}",
+						"{{test_brewRecipeId}}",
+						"{{endpoint_recipeSteps}}",
+						"{{test_recipeStepId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "06 - Generate Upload Url for Image",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains an upload Url\", function () {\r",
+							"    pm.expect(jsonData.uploadUrl).to.be.a(\"string\");\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{host_url}}/{{endpoint_brewRecipes}}/{{test_brewRecipeId}}/{{endpoint_recipeSteps}}/{{test_recipeStepId}}/{{endpoint_imageUpload}}",
+					"host": [
+						"{{host_url}}"
+					],
+					"path": [
+						"{{endpoint_brewRecipes}}",
+						"{{test_brewRecipeId}}",
+						"{{endpoint_recipeSteps}}",
+						"{{test_recipeStepId}}",
+						"{{endpoint_imageUpload}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "07 - Get Recipe Steps by Recipe ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"const recipeId = jsonData.recipeId;\r",
+							"const steps = jsonData.steps;\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Recipe Id in the response should match the request\", function () {\r",
+							"    pm.expect(recipeId).to.eq(pm.collectionVariables.get(\"test_brewRecipeId\"));\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response should contain an array of recipe steps\", function () {\r",
+							"    pm.expect(steps).to.be.a(\"array\");\r",
+							"    pm.expect(steps[0]).to.be.an(\"object\");\r",
+							"    pm.expect(steps[0].recipeId).to.be.a(\"string\");\r",
+							"    pm.expect(steps[0].stepId).to.be.a(\"string\");\r",
+							"    pm.expect(steps[0].createdAt).to.be.a(\"string\");\r",
+							"    pm.expect(steps[0].updatedAt).to.be.a(\"string\");\r",
+							"    pm.expect(steps[0].position).to.be.a(\"number\");\r",
+							"    pm.expect(steps[0].instructions).to.be.a(\"string\");\r",
+							"    pm.expect(steps[0].durationInMS).to.be.a(\"number\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host_url}}/{{endpoint_brewRecipes}}/{{test_brewRecipeId}}/{{endpoint_recipeSteps}}",
+					"host": [
+						"{{host_url}}"
+					],
+					"path": [
+						"{{endpoint_brewRecipes}}",
+						"{{test_brewRecipeId}}",
+						"{{endpoint_recipeSteps}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "08 - Delete Recipe Step",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"const step = jsonData.step;\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response should contain the deleted recipe step\", function () {\r",
+							"    pm.expect(step).to.be.a(\"object\");\r",
+							"    pm.expect(step.recipeId).to.eq(pm.collectionVariables.get(\"test_brewRecipeId\"));\r",
+							"    pm.expect(step.stepId).to.eq(pm.collectionVariables.get(\"test_recipeStepId\"));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{host_url}}/{{endpoint_brewRecipes}}/{{test_brewRecipeId}}/{{endpoint_recipeSteps}}/{{test_recipeStepId}}",
+					"host": [
+						"{{host_url}}"
+					],
+					"path": [
+						"{{endpoint_brewRecipes}}",
+						"{{test_brewRecipeId}}",
+						"{{endpoint_recipeSteps}}",
+						"{{test_recipeStepId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "09 - Delete Brew Recipe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"const recipe = jsonData.recipe;\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response should contain the deleted Brew Recipe\", function () {\r",
+							"    pm.expect(recipe).to.be.a(\"object\");\r",
+							"    pm.expect(recipe.recipeId).to.eq(pm.collectionVariables.get(\"test_brewRecipeId\"));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{host_url}}/{{endpoint_brewRecipes}}/{{test_brewRecipeId}}",
+					"host": [
+						"{{host_url}}"
+					],
+					"path": [
+						"{{endpoint_brewRecipes}}",
+						"{{test_brewRecipeId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
+				"key": "useBrowser",
+				"value": true,
+				"type": "boolean"
+			},
+			{
+				"key": "state",
+				"value": "0a-9sj8df-0ajs9",
+				"type": "string"
+			},
+			{
+				"key": "authUrl",
+				"value": "https://{{auth0_domain}}/authorize?audience={{auth0_audience}}",
+				"type": "string"
+			},
+			{
+				"key": "grant_type",
+				"value": "authorization_code",
+				"type": "string"
+			},
+			{
+				"key": "scope",
+				"value": "openid profile email",
+				"type": "string"
+			},
+			{
+				"key": "tokenName",
+				"value": "access_token",
+				"type": "string"
+			},
+			{
+				"key": "accessTokenUrl",
+				"value": "https://{{auth0_domain}}/oauth/token",
+				"type": "string"
+			},
+			{
+				"key": "clientSecret",
+				"value": "{{auth0_clientSecret}}",
+				"type": "string"
+			},
+			{
+				"key": "redirect_uri",
+				"value": "http://localhost:4200",
+				"type": "string"
+			},
+			{
+				"key": "clientId",
+				"value": "{{auth0_clientId}}",
+				"type": "string"
+			},
+			{
+				"key": "addTokenTo",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "auth0_domain",
+			"value": "dev-x4xgby3m.us.auth0.com"
+		},
+		{
+			"key": "auth0_clientId",
+			"value": "vRL64ogqHdKKAf7QL9KUxLIVbmtZYoTh"
+		},
+		{
+			"key": "auth0_clientSecret",
+			"value": "G6ltd07w_yFWhwpohhWbWTZmLJ4SFOyXOL-18_6lRVQpsNlvnaaL1GmtCGN_25br"
+		},
+		{
+			"key": "auth0_audience",
+			"value": "https://c0er7cnhhl.execute-api.us-east-2.amazonaws.com/dev"
+		},
+		{
+			"key": "endpoint_brewRecipes",
+			"value": "brewRecipes"
+		},
+		{
+			"key": "endpoint_recipeSteps",
+			"value": "steps"
+		},
+		{
+			"key": "endpoint_imageUpload",
+			"value": "image"
+		},
+		{
+			"key": "test_brewRecipeId",
+			"value": "496967d8-e5b3-4a64-a08a-da5ba44ae731"
+		},
+		{
+			"key": "test_recipeStepId",
+			"value": "6937d57a-8fde-4bf2-a6dc-67f78608df72"
+		},
+		{
+			"key": "test_title",
+			"value": "My First Hario V60 Brew Recipe"
+		},
+		{
+			"key": "test_title_update",
+			"value": "Updated Title for Brew Recipe"
+		},
+		{
+			"key": "test_userId",
+			"value": "google-oauth2|117018182697685977858"
+		},
+		{
+			"key": "test_step_instructions",
+			"value": "Measure 18g of Coffee Beans and grind at a medium-fine setting"
+		},
+		{
+			"key": "test_step_instruction_update",
+			"value": "Measure 20g of Coffee Beans and grind at a medium-fine setting"
+		}
+	]
+}
