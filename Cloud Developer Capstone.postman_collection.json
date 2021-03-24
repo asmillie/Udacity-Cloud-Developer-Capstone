@@ -458,6 +458,16 @@
 		"type": "oauth2",
 		"oauth2": [
 			{
+				"key": "tokenType",
+				"value": "Bearer",
+				"type": "string"
+			},
+			{
+				"key": "accessToken",
+				"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Im1BY0ZhT3RycV9wM3N5bnJaX3hOUCJ9.eyJpc3MiOiJodHRwczovL2Rldi14NHhnYnkzbS51cy5hdXRoMC5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMTcwMTgxODI2OTc2ODU5Nzc4NTgiLCJhdWQiOlsiaHR0cHM6Ly9jMGVyN2NuaGhsLmV4ZWN1dGUtYXBpLnVzLWVhc3QtMi5hbWF6b25hd3MuY29tL2RldiIsImh0dHBzOi8vZGV2LXg0eGdieTNtLnVzLmF1dGgwLmNvbS91c2VyaW5mbyJdLCJpYXQiOjE2MTY1MDg4NDUsImV4cCI6MTYxNjU5NTI0NSwiYXpwIjoidlJMNjRvZ3FIZEtLQWY3UUw5S1V4TElWYm10WllvVGgiLCJzY29wZSI6Im9wZW5pZCBwcm9maWxlIGVtYWlsIn0.eQVi0piAeR9wiQhluv-ull4rqS4yGC4tqa0ERlnPUROxDHvzFXOlEAoxkIpQsGv3j1wQ5P_rX31ttrkEbUUVGJuDU2wwf72UvzqIadRIa6amup7PlG2JeKq6sa50Gw5ILvg2fyCs0R_ZXNyQA_JSKMnq5L2ksd-shy1zQ4IIqI6viNnVlazlCvkX6S3IhmlXZKbKL1fbB1_cvgH8d3ah07fee1Ss5OqnZiyB01-0WtsUGYea_qnOfdEfUwa3TAlV-aKHvJJWba7hPAWkSfvWeo4wIACMsU1SARAWrd51MQ7pcLMfpSJJ5DUuXGl7E_JlVROlv2gy15qWrQFMUPXrCQ",
+				"type": "string"
+			},
+			{
 				"key": "useBrowser",
 				"value": true,
 				"type": "boolean"
@@ -536,6 +546,10 @@
 	],
 	"variable": [
 		{
+			"key": "host_url",
+			"value": "https://c0er7cnhhl.execute-api.us-east-2.amazonaws.com/dev"
+		},
+		{
 			"key": "auth0_domain",
 			"value": "dev-x4xgby3m.us.auth0.com"
 		},
@@ -565,11 +579,11 @@
 		},
 		{
 			"key": "test_brewRecipeId",
-			"value": "496967d8-e5b3-4a64-a08a-da5ba44ae731"
+			"value": "4fd090de-b1de-4e7c-b6da-1e1b19c16184"
 		},
 		{
 			"key": "test_recipeStepId",
-			"value": "6937d57a-8fde-4bf2-a6dc-67f78608df72"
+			"value": "19bc229c-436d-4b48-bf16-861bbf2c355b"
 		},
 		{
 			"key": "test_title",
